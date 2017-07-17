@@ -30,7 +30,7 @@ else
 fi
 
 UBOOT_BOOTCMD="ext4load mmc 0:1 0x40008000 zImage; ext4load mmc 0:1 0x48000000 ramdisk.img; ext4load mmc 0:1 0x49000000 s5p4418-zh_dragon-rev00.dtb; bootz 0x40008000 0x48000000 0x49000000"
-UBOOT_BOOTARGS="console=ttyAMA3,115200n8 loglevel=7 printk.time=1 androidboot.hardware=zh_dragon androidboot.console=ttyAMA3 androidboot.serialno=s5p4418_zh_dragon nx_drm.fb_buffers=3 nx_drm.fb_vblank"
+UBOOT_BOOTARGS="console=ttyAMA3,115200n8 loglevel=7 printk.time=1 androidboot.hardware=zh_dragon androidboot.console=ttyAMA3 androidboot.serialno=s5p4418_zh_dragon nx_drm.fb_buffers=3 nx_drm.fb_vblank nx_drm.fb_pan_crtcs=0x1 quiet"
 
 if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_BL1}" == "true" ]; then
 	build_bl1_s5p4418 ${BL1_DIR}/bl1-${TARGET_SOC} nxp4330 zh_dragon 0

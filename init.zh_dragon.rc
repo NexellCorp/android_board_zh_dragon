@@ -18,12 +18,11 @@ import init.zh_dragon.usb.rc
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
+    chmod 0755 /sys/kernel/debug
 
 on fs
-    mount_all ./fstab.zh_dragon
+    mount_all ./fstab.zh_dragon --early
     swapon_all ./fstab.zh_dragon
-
-    restorecon_recursive /persist
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
@@ -39,8 +38,14 @@ on boot
     write /proc/sys/net/core/wmem_max  8388608
 
 on post-fs
-    write /sys/block/mmcblk0/queue/rq_affinity 0
-    write /sys/block/mmcblk0/queue/scheduler noop
+    chmod 0755 /sys/kernel/debug/tracing
+
+on late-fs
+    start servicemanager
+    start surfaceflinger
+    start audioserver
+    start bootanim
+    mount_all ./fstab.zh_dragon --late
 
 on post-fs-data
     setprop vold.post_fs_data_done 1
@@ -51,3 +56,6 @@ on post-fs-data
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
 
+    chmod 0666 /data/system/users/0/wallpaper_orig
+    chmod 0666 /data/system/users/0/wallpaper
+    chmod 0666 /data/system/users/0/wallpaper_info.xml

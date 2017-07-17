@@ -55,6 +55,10 @@ PRODUCT_COPY_FILES += \
 	device/nexell/zh_dragon/wallpaper_orig:/data/system/users/0/wallpaper_orig \
 	device/nexell/zh_dragon/wallpaper_info.xml:/data/system/users/0/wallpaper_info.xml
 
+# memtester
+PRODUCT_COPY_FILES += \
+	device/nexell/zh_dragon/memtester:/system/bin/memtester
+
 PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_AAPT_CONFIG := normal

@@ -6,4 +6,3 @@
 /dev/block/mmcblk0p4	u:object_r:userdata_block_device:s0
 
 # files in /system
-/system/bin/rtw_fwloader u:object_r:rtw_exec:s0

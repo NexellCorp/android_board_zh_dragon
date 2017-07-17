@@ -39,13 +39,10 @@ USE_OPENGL_RENDERER := true
 TARGET_USES_ION := true
 NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
 # see surfaceflinger
-TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
 MAX_VIRTUAL_DISPLAY_DIMENSION := 2048
 
 # hwcomposer
-# BOARD_USES_NX_SIMPLE_HWCOMPOSER := true
-BOARD_USES_NX_DRM_HWCOMPOSER := true
-BOARD_DRM_HWCOMPOSER_BUFFER_IMPORTER := mali-gralloc
+BOARD_USES_NX_HWCOMPOSER := true
 
 # Enable dex-preoptimization to speed up first boot sequence
 ifeq ($(HOST_OS),linux)

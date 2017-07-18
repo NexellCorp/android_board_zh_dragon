@@ -11,7 +11,7 @@ source ${TOP}/device/nexell/tools/make_build_info.sh
 
 BOARD=$(get_board_name $0)
 
-parse_args -b ${BOARD} $@
+parse_args -b ${BOARD} -s s5p4418 $@
 print_args
 setup_toolchain
 export_work_dir

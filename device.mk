@@ -14,11 +14,14 @@
 # limitations under the License.
 #
 
+PRODUCT_SHIPPING_API_LEVEL := 25
+
 PRODUCT_COPY_FILES += \
 	device/nexell/zh_dragon/init.zh_dragon.rc:root/init.zh_dragon.rc \
 	device/nexell/zh_dragon/init.zh_dragon.usb.rc:root/init.zh_dragon.usb.rc \
 	device/nexell/zh_dragon/fstab.zh_dragon:root/fstab.zh_dragon \
-	device/nexell/zh_dragon/ueventd.zh_dragon.rc:root/ueventd.zh_dragon.rc
+	device/nexell/zh_dragon/ueventd.zh_dragon.rc:root/ueventd.zh_dragon.rc \
+	device/nexell/zh_dragon/init.recovery.zh_dragon.rc:root/init.recovery.zh_dragon.rc
 
 PRODUCT_COPY_FILES += \
 	frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
@@ -41,13 +44,13 @@ PRODUCT_COPY_FILES += \
 
 # hardware features
 PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
+	device/nexell/zh_dragon/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
 	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
 	frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
-	frameworks/native/data/etc/android.hardware.opengles.aep.xml:system/etc/permissions/android.hardware.opengles.aep.xml
+	frameworks/native/data/etc/android.hardware.faketouch.xml:system/etc/permissions/android.hardware.faketouch.xml
 
 # wallpaper
 PRODUCT_COPY_FILES += \
@@ -59,11 +62,16 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
 	device/nexell/zh_dragon/memtester:/system/bin/memtester
 
+# Recovery
+PRODUCT_PACKAGES += \
+	librecovery_updater_nexell
+
 PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_AAPT_CONFIG := normal
+PRODUCT_AAPT_CONFIG += mdpi xlarge large
 PRODUCT_AAPT_PREF_CONFIG := hdpi
-PRODUCT_AAPT_PREBUILT_DPI := xxhdpi xhdpi hdpi
+PRODUCT_AAPT_PREBUILT_DPI := xxhdpi xhdpi hdpi mdpi ldpi
 PRODUCT_CHARACTERISTICS := tablet
 
 # OpenGL ES API version: 2.0
@@ -90,7 +98,9 @@ PRODUCT_PACKAGES += \
 	gralloc.zh_dragon \
 	libGLES_mali \
 	hwcomposer.zh_dragon \
-	audio.primary.zh_dragon
+	audio.primary.zh_dragon \
+	memtrack.zh_dragon \
+	camera.zh_dragon
 
 # tinyalsa
 PRODUCT_PACKAGES += \
@@ -110,4 +120,26 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	dalvik.vm.dex2oat-threads=4 \
 	dalvik.vm.image-dex2oat-threads=4
 
-$(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.heapstartsize=16m \
+    dalvik.vm.heapgrowthlimit=256m \
+    dalvik.vm.heapsize=512m \
+    dalvik.vm.heaptargetutilization=0.75 \
+    dalvik.vm.heapminfree=512k \
+    dalvik.vm.heapmaxfree=8m
+
+# HWUI common settings
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.hwui.gradient_cache_size=1 \
+    ro.hwui.drop_shadow_cache_size=6 \
+    ro.hwui.r_buffer_cache_size=8 \
+    ro.hwui.texture_cache_flushrate=0.4 \
+    ro.hwui.text_small_cache_width=1024 \
+    ro.hwui.text_small_cache_height=1024 \
+    ro.hwui.text_large_cache_width=2048 \
+    ro.hwui.text_large_cache_height=1024
+
+#skip boot jars check
+SKIP_BOOT_JARS_CHECK := true
+
+$(call inherit-product, frameworks/base/data/fonts/fonts.mk)

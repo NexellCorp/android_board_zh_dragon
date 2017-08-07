@@ -65,6 +65,10 @@ BOARD_HAVE_BLUETOOTH := false
 
 BOARD_CHARGER_ENABLE_SUSPEND := false
 
+# ffmpeg libraries
+EN_FFMPEG_EXTRACTOR := false
+EN_FFMPEG_AUDIO_DEC := false
+
 # sepolicy
 BOARD_SEPOLICY_DIRS += \
 	device/nexell/zh_dragon/sepolicy

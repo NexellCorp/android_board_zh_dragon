@@ -135,7 +135,8 @@ PRODUCT_PACKAGES += \
 	hwcomposer.zh_dragon \
 	audio.primary.zh_dragon \
 	memtrack.zh_dragon \
-	camera.zh_dragon
+	camera.zh_dragon \
+	lights.zh_dragon
 
 # tinyalsa
 PRODUCT_PACKAGES += \

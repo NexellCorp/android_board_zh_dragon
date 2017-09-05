@@ -64,8 +64,8 @@ if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_SECURE}" == "true" ]; then
 fi
 
 if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_KERNEL}" == "true" ]; then
-	build_kernel ${KERNEL_DIR} ${TARGET_SOC} ${BOARD_NAME} s5p4418_zh_dragon_oreo_defconfig ${CROSS_COMPILE}
-	# build_kernel ${KERNEL_DIR} ${TARGET_SOC} ${BOARD_NAME} s5p4418_zh_dragon_oreo_defconfig arm-linux-androideabi-
+	# build_kernel ${KERNEL_DIR} ${TARGET_SOC} ${BOARD_NAME} s5p4418_zh_dragon_oreo_defconfig ${CROSS_COMPILE}
+	build_kernel ${KERNEL_DIR} ${TARGET_SOC} ${BOARD_NAME} s5p4418_zh_dragon_oreo_defconfig arm-linux-androideabi-
 	test -d ${OUT_DIR} && \
 		cp ${KERNEL_IMG} ${OUT_DIR}/kernel && \
 		cp ${DTB_IMG} ${OUT_DIR}/2ndbootloader

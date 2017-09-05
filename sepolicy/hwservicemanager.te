@@ -1,0 +1,6 @@
+allow hwservicemanager unlabeled:dir { getattr search };
+allow hwservicemanager unlabeled:file { read open getattr };
+allow hwservicemanager init:dir search;
+allow hwservicemanager init:binder call;
+allow hwservicemanager init:file { read open };
+allow hwservicemanager init:process getattr;

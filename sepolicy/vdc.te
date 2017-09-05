@@ -1,0 +1,1 @@
+allow vdc unlabeled:dir { getattr search };

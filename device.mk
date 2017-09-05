@@ -14,88 +14,41 @@
 # limitations under the License.
 #
 
+# refer to marlin/sailfish
+#
+KERNEL_DIR := $(LOCAL_PATH)/../kernel/kernel-4.4.x
+
+PRODUCT_AAPT_CONFIG := normal xlarge large
+PRODUCT_AAPT_PREF_CONFIG := hdpi
+PRODUCT_AAPT_PREBUILT_DPI := xxhdpi xhdpi hdpi mdpi ldpi
+
 PRODUCT_SHIPPING_API_LEVEL := 25
 
-PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/init.zh_dragon.rc:root/init.zh_dragon.rc \
-	device/nexell/zh_dragon/init.zh_dragon.usb.rc:root/init.zh_dragon.usb.rc \
-	device/nexell/zh_dragon/fstab.zh_dragon:root/fstab.zh_dragon \
-	device/nexell/zh_dragon/ueventd.zh_dragon.rc:root/ueventd.zh_dragon.rc \
-	device/nexell/zh_dragon/init.recovery.zh_dragon.rc:root/init.recovery.zh_dragon.rc
+DEVICE_PACKAGE_OVERLAYS += device/nexell/zh_dragon/overlay
+
+# PRODUCT_ENFORCE_RRO_TARGETS := \
+	framework-res
 
 PRODUCT_COPY_FILES += \
-	frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
-	frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml
-
-# audio
-PRODUCT_COPY_FILES += \
-	frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:system/etc/a2dp_audio_policy_configuration.xml \
-	frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:system/etc/r_submix_audio_policy_configuration.xml \
-	frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:system/etc/usb_audio_policy_configuration.xml \
-	frameworks/av/services/audiopolicy/config/default_volume_tables.xml:system/etc/default_volume_tables.xml
+	$(KERNEL_DIR)/arch/arm/boot/zImage:kernel
 
 PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/audio/tiny_hw.zh_dragon.xml:system/etc/tiny_hw.zh_dragon.xml \
-	device/nexell/zh_dragon/audio/audio_policy.conf:system/etc/audio_policy.conf
+	$(KERNEL_DIR)/arch/arm/boot/dts/s5p4418-zh_dragon-rev00.dtb:2ndbootloader
+
+# Vendor Interface Manifest
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/manifest.xml:vendor/manifest.xml
 
 PRODUCT_COPY_FILES += \
-	frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
-	device/nexell/zh_dragon/media_codecs.xml:system/etc/media_codecs.xml
-
-# ffmpeg libraries
-EN_FFMPEG_EXTRACTOR := false
-EN_FFMPEG_AUDIO_DEC := false
-
-ifeq ($(EN_FFMPEG_EXTRACTOR),true)
-
-PRODUCT_COPY_FILES += \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavcodec.so:system/lib/libavcodec.so    \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavcodec.so.55:system/lib/libavcodec.so.55    \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavcodec.so.55.39.101:system/lib/libavcodec.so.55.39.101    \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavdevice.so:system/lib/libavdevice.so  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavdevice.so.55:system/lib/libavdevice.so.55  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavdevice.so.55.5.100:system/lib/libavdevice.so.55.5.100  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavfilter.so:system/lib/libavfilter.so  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavfilter.so.3:system/lib/libavfilter.so.3  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavfilter.so.3.90.100:system/lib/libavfilter.so.3.90.100  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavformat.so:system/lib/libavformat.so  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavformat.so.55:system/lib/libavformat.so.55  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavformat.so.55.19.104:system/lib/libavformat.so.55.19.104  \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavresample.so:system/lib/libavresample.so      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavresample.so.1:system/lib/libavresample.so.1      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavresample.so.1.1.0:system/lib/libavresample.so.1.1.0      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavutil.so:system/lib/libavutil.so      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavutil.so.52:system/lib/libavutil.so.52      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libavutil.so.52.48.101:system/lib/libavutil.so.52.48.101      \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswresample.so:system/lib/libswresample.so \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswresample.so.0:system/lib/libswresample.so.0 \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswresample.so.0.17.104:system/lib/libswresample.so.0.17.104 \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswscale.so:system/lib/libswscale.so \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswscale.so.2:system/lib/libswscale.so.2 \
-	hardware/nexell/s5pxx18/omx/codec/ffmpeg/32bit/libs/libswscale.so.2.5.101:system/lib/libswscale.so.2.5.101
-
-endif	#EN_FFMPEG_EXTRACTOR
-
-
-# hardware features
-PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
-	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
-	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
-	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
-	frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
-	frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
-	frameworks/native/data/etc/android.hardware.faketouch.xml:system/etc/permissions/android.hardware.faketouch.xml
-
-# wallpaper
-PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/wallpaper:/data/system/users/0/wallpaper \
-	device/nexell/zh_dragon/wallpaper_orig:/data/system/users/0/wallpaper_orig \
-	device/nexell/zh_dragon/wallpaper_info.xml:/data/system/users/0/wallpaper_info.xml
+	$(LOCAL_PATH)/init.zh_dragon.rc:root/init.zh_dragon.rc \
+	$(LOCAL_PATH)/init.zh_dragon.usb.rc:root/init.zh_dragon.usb.rc \
+	$(LOCAL_PATH)/ueventd.zh_dragon.rc:root/ueventd.zh_dragon.rc \
+	$(LOCAL_PATH)/fstab.zh_dragon:root/fstab.zh_dragon \
+	$(LOCAL_PATH)/init.recovery.zh_dragon.rc:root/init.recovery.zh_dragon.rc
 
 # memtester
 PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/memtester:/system/bin/memtester
+	device/nexell/zh_dragon/memtester:system/bin/memtester
 
 # Recovery
 PRODUCT_PACKAGES += \
@@ -103,10 +56,6 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_TAGS += dalvik.gc.type-precise
 
-PRODUCT_AAPT_CONFIG := normal
-PRODUCT_AAPT_CONFIG += mdpi xlarge large
-PRODUCT_AAPT_PREF_CONFIG := hdpi
-PRODUCT_AAPT_PREBUILT_DPI := xxhdpi xhdpi hdpi mdpi ldpi
 PRODUCT_CHARACTERISTICS := tablet
 
 # OpenGL ES API version: 2.0
@@ -165,7 +114,44 @@ ifeq ($(EN_FFMPEG_EXTRACTOR),true)
 PRODUCT_PACKAGES += libNX_FFMpegExtractor
 endif
 
-DEVICE_PACKAGE_OVERLAYS := device/nexell/zh_dragon/overlay
+# New HAL Interface
+# ConfigStore
+PRODUCT_PACKAGES += \
+	android.hardware.configstore@1.0-service
+
+# Health HAL
+PRODUCT_PACKAGES += \
+    android.hardware.health@1.0-impl
+
+# Keymaster HAL
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0-impl
+
+# Gralloc
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.allocator@2.0-impl \
+    android.hardware.graphics.allocator@2.0-service \
+    android.hardware.graphics.mapper@2.0-impl
+
+# HW Composer
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.composer@2.1-impl \
+    android.hardware.graphics.composer@2.1-service
+
+# Audio
+PRODUCT_PACKAGES += \
+    android.hardware.audio@2.0-impl \
+    android.hardware.audio.effect@2.0-impl \
+    android.hardware.broadcastradio@1.0-impl \
+    android.hardware.soundtrigger@2.0-impl
+
+# new gatekeeper HAL
+# PRODUCT_PACKAGES += \
+    android.hardware.gatekeeper@1.0-impl
+
+# RenderScript HAL
+# PRODUCT_PACKAGES += \
+    android.hardware.renderscript@1.0-impl
 
 # limit dex2oat threads to improve thermals
 PRODUCT_PROPERTY_OVERRIDES += \

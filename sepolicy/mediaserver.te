@@ -1,0 +1,3 @@
+allow mediaserver unlabeled:dir { getattr search };
+allow mediaserver init:binder call;
+allow mediaserver unlabeled:dir { read getattr search open };

@@ -1,1 +1,3 @@
 allow bootanim rootfs:lnk_file getattr;
+allow bootanim unlabeled:dir { getattr search read open };
+allow bootanim unlabeled:file { getattr read open execute };

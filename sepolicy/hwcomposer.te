@@ -1,0 +1,4 @@
+type hwcomposer-2-1, domain;
+type hwcomposer-2-1_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(hwcomposer-2-1)

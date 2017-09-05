@@ -1,0 +1,3 @@
+allow surfaceflinger unlabeled:dir { getattr search read open };
+allow surfaceflinger init:binder call;
+allow surfaceflinger unlabeled:file { read open getattr execute };

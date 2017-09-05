@@ -1,0 +1,2 @@
+allow fsck unlabeled:dir { getattr read write search };
+allow fsck block_device:blk_file { read write open ioctl };

@@ -22,30 +22,23 @@ PRODUCT_DEVICE := zh_dragon
 PRODUCT_BRAND := Android
 PRODUCT_MODEL := AOSP on zh_dragon
 PRODUCT_MANUFACTURER := NEXELL
+PRODUCT_RESTRICT_VENDOR_FILES := true
 
-PRODUCT_COPY_FILES += \
-	device/nexell/kernel/kernel-4.4.x/arch/arm/boot/zImage:kernel
-
-PRODUCT_COPY_FILES += \
-	device/nexell/kernel/kernel-4.4.x/arch/arm/boot/dts/s5p4418-zh_dragon-rev00.dtb:2ndbootloader
-
-PRODUCT_COPY_FILES += \
-	device/nexell/zh_dragon/fstab.zh_dragon:root/fstab.zh_dragon
-
-PRODUCT_PROPERTY_OVERRIDES += \
+# PRODUCT_PROPERTY_OVERRIDES += \
 	ro.product.first_api_level=21
 
 # Disable bluetooth because zh_dragon does not use bluetooth source
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_bluetooth=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_bluetooth=true
 
 # Disable other feature no needed in avn board
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_serial=true
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_samplingprof=true
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_consumerir=true
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_rtt=true
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_vrmanager=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_serial=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_samplingprof=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_consumerir=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_rtt=true
+# PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_vrmanager=true
 
 $(call inherit-product, device/nexell/zh_dragon/device.mk)
 
 PRODUCT_PACKAGES += \
-	Launcher3
+	Launcher3 \
+	WallpaperPicker

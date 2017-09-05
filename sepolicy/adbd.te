@@ -1,1 +1,1 @@
-allow adbd security_file:dir search;
+#allow adbd security_file:dir search;

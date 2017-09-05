@@ -1,0 +1,1 @@
+allow webview_zygote unlabeled:dir { getattr search open read };

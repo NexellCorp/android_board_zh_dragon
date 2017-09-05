@@ -1,1 +1,3 @@
 allow audioserver rootfs:lnk_file getattr;
+allow audioserver unlabeled:dir { getattr search read open };
+allow audioserver unlabeled:file { getattr read open execute };

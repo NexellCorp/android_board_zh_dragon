@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+# Build a separate vendor.img
+TARGET_COPY_OUT_VENDOR := vendor
+
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_ABI := armeabi-v7a
@@ -27,6 +30,9 @@ TARGET_NO_BOOTLOADER := false
 TARGET_NO_KERNEL := false
 TARGET_NO_RADIOIMAGE := true
 TARGET_NO_RECOVERY := false
+
+# Disable emulator for "make dist" until there is a 64-bit qemu kernel
+BUILD_EMULATOR := false
 
 TARGET_BOARD_PLATFORM := s5p4418
 TARGET_BOOTLOADER_BOARD_NAME := zh_dragon
@@ -65,6 +71,8 @@ BOARD_HAVE_BLUETOOTH := false
 
 BOARD_CHARGER_ENABLE_SUSPEND := false
 
+BOARD_USES_64_BIT_BINDER := false
+
 # ffmpeg libraries
 EN_FFMPEG_EXTRACTOR := false
 EN_FFMPEG_AUDIO_DEC := false
@@ -81,6 +89,8 @@ BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_CACHEIMAGE_PARTITION_SIZE := 536870912
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 4920246272
 BOARD_FLASH_BLOCK_SIZE := 131072
+
+ART_USE_HSPACE_COMPACT := true
 
 # boot image layout
 BOARD_KERNEL_PAGESIZE := 2048

@@ -1,0 +1,3 @@
+allow platform_app unlabeled:dir { getattr open read search };
+allow platform_app init:binder call;
+allow platform_app unlabeled:file { getattr open read execute };

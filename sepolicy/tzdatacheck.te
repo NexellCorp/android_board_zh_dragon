@@ -1,0 +1,1 @@
+allow tzdatacheck unlabeled:dir { getattr search };

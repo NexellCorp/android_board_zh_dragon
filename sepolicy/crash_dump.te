@@ -1,0 +1,3 @@
+allow crash_dump unlabeled:dir { getattr search open read write };
+allow crash_dump init:process { ptrace signal };
+allow crash_dump unlabeled:file { read open getattr };

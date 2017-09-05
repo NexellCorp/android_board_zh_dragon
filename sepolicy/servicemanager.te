@@ -1,0 +1,1 @@
+allow servicemanager unlabeled:dir { getattr search read open };

@@ -1,1 +1,2 @@
 allow cameraserver rootfs:lnk_file getattr;
+allow cameraserver unlabeled:dir { getattr search read open };

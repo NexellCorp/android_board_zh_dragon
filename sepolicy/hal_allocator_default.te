@@ -1,0 +1,3 @@
+#type hal_allocator_default, domain;
+
+# allow hal_allocator_default unlabeled:dir getattr;

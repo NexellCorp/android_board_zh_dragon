@@ -1,0 +1,1 @@
+allow tombstoned unlabeled:dir { getattr search };

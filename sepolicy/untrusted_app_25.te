@@ -1,0 +1,2 @@
+allow untrusted_app_25 unlabeled:dir { getattr search read open };
+allow untrusted_app_25 unlabeled:file { getattr open read execute };

@@ -1,0 +1,2 @@
+allow healthd unlabeled:dir { getattr search read open };
+allow healthd unlabeled:file { read open getattr execute };

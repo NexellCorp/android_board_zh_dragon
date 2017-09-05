@@ -1,0 +1,1 @@
+allow mediametrics unlabeled:dir { getattr search };

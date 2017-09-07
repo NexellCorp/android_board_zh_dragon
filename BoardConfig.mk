@@ -21,6 +21,7 @@ TARGET_CPU_ABI2 := armeabi
 TARGET_CPU_VARIANT := cortex-a9
 
 ENABLE_CPUSETS := true
+ENABLE_SCHEDBOOST := true
 
 # TODO: afterwards fixup below setting
 TARGET_NO_BOOTLOADER := false

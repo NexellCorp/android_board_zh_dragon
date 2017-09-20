@@ -9,8 +9,6 @@ source ${TOP}/device/nexell/tools/common.sh
 source ${TOP}/device/nexell/tools/dir.sh
 source ${TOP}/device/nexell/tools/make_build_info.sh
 
-BOARD=$(get_board_name $0)
-
 parse_args -s s5p4418 $@
 print_args
 setup_toolchain
@@ -77,7 +75,22 @@ fi
 test -d ${OUT_DIR} && test -f ${DEVICE_DIR}/bootloader && cp ${DEVICE_DIR}/bootloader ${OUT_DIR}
 
 if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ]; then
-	build_android ${TARGET_SOC} ${BOARD_NAME} userdebug
+	if [ "${QUICKBOOT}" == "true" ]; then
+		cp ${DEVICE_DIR}/quickboot/* ${DEVICE_DIR}
+
+		rm -rf ${OUT_DIR}/system
+		rm -rf ${OUT_DIR}/root
+		rm -rf ${OUT_DIR}/data
+	else
+		cd ${DEVICE_DIR}
+		git checkout aosp_zh_dragon.mk
+		git checkout device.mk
+		git checkout fstab.zh_dragon
+		git checkout init.zh_dragon.rc
+		cd ${TOP}
+	fi
+
+	build_android ${TARGET_SOC} ${BOARD_NAME} ${BUILD_TAG}
 fi
 
 # u-boot envs

@@ -13,7 +13,12 @@ parse_args -s s5p4418 $@
 print_args
 setup_toolchain
 export_work_dir
+
+${TOP}/device/nexell/tools/revert_patches.sh
 patches
+if [ "${QUICKBOOT}" == "true" ]; then
+	quickboot_patches
+fi
 
 DEV_PORTNUM=0
 MEMSIZE="2GB"

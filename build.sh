@@ -86,13 +86,13 @@ if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ]; then
 		rm -rf ${OUT_DIR}/system
 		rm -rf ${OUT_DIR}/root
 		rm -rf ${OUT_DIR}/data
-	else
-		cd ${DEVICE_DIR}
-		git checkout aosp_zh_dragon.mk
-		cd ${TOP}
 	fi
 
 	build_android ${TARGET_SOC} ${BOARD_NAME} ${BUILD_TAG}
+
+	cd ${DEVICE_DIR}
+	git checkout aosp_zh_dragon.mk
+	cd ${TOP}
 fi
 
 # u-boot envs

@@ -89,9 +89,6 @@ if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ]; then
 	else
 		cd ${DEVICE_DIR}
 		git checkout aosp_zh_dragon.mk
-		git checkout device.mk
-		git checkout fstab.zh_dragon
-		git checkout init.zh_dragon.rc
 		cd ${TOP}
 	fi
 

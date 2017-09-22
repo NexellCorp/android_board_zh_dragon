@@ -194,3 +194,21 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 #skip boot jars check
 SKIP_BOOT_JARS_CHECK := true
+
+# libfuse
+PRODUCT_PACKAGES += \
+	libfuse
+
+# exfat
+PRODUCT_PACKAGES += \
+	libexfat \
+	mount.exfat \
+	mkfs.exfat \
+	fsck.exfat
+
+# ntfs
+PRODUCT_PACKAGES += \
+	libntfs-3g \
+	mount.ntfs \
+	fsck.ntfs \
+	mkfs.ntfs

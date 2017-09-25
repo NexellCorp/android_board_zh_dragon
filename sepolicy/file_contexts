@@ -8,3 +8,6 @@
 /dev/rearcam        	u:object_r:rearcam_device:s0
 
 # files in /system
+/system/bin/rtw_fwloader u:object_r:rtw_exec:s0
+/system/bin/mcuserver	u:object_r:mcuserver_exec:s0
+/system/bin/gocsdk	u:object_r:gocsdk_exec:s0

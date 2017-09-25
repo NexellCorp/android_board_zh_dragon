@@ -40,7 +40,8 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_COPY_FILES += \
 	frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
-	device/nexell/zh_dragon/media_codecs.xml:system/etc/media_codecs.xml
+	device/nexell/zh_dragon/media_codecs.xml:system/etc/media_codecs.xml \
+	device/nexell/zh_dragon/media_profiles.xml:system/etc/media_profiles.xml
 
 # ffmpeg libraries
 EN_FFMPEG_EXTRACTOR := false
@@ -87,6 +88,15 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
 	frameworks/native/data/etc/android.hardware.faketouch.xml:system/etc/permissions/android.hardware.faketouch.xml
 
+# LC44X_bt
+PRODUCT_COPY_FILES += \
+	device/nexell/zh_dragon/LC44X_bt_wifi/gocsdk:system/bin/gocsdk \
+	device/nexell/zh_dragon/LC44X_bt_wifi/config.ini:system/config.ini \
+	device/nexell/zh_dragon/LC44X_bt_wifi/ring.mp3:system/ring.mp3
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+        ro.kernel.android.bt=goc_serial
+
 # wallpaper
 PRODUCT_COPY_FILES += \
 	device/nexell/zh_dragon/wallpaper:/data/system/users/0/wallpaper \
@@ -105,8 +115,8 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_CONFIG += mdpi xlarge large
-PRODUCT_AAPT_PREF_CONFIG := hdpi
-PRODUCT_AAPT_PREBUILT_DPI := xxhdpi xhdpi hdpi mdpi ldpi
+PRODUCT_AAPT_PREF_CONFIG := mdpi
+PRODUCT_AAPT_PREBUILT_DPI := hdpi mdpi ldpi
 PRODUCT_CHARACTERISTICS := tablet
 
 # OpenGL ES API version: 2.0
@@ -165,6 +175,17 @@ ifeq ($(EN_FFMPEG_EXTRACTOR),true)
 PRODUCT_PACKAGES += libNX_FFMpegExtractor
 endif
 
+# zhong car related feature
+PRODUCT_COPY_FILES += \
+	device/nexell/zh_dragon/zhong_lib/libzhmcu.so:system/lib/libzhmcu.so \
+	device/nexell/zh_dragon/mcuserver:system/bin/mcuserver \
+	device/nexell/zh_dragon/zhong_lib/libmcuserverclient_jni.so:system/lib/libmcuserverclient_jni.so \
+	device/nexell/zh_dragon/zhong_lib/libjsoncpp.so:system/lib/libjsoncpp.so
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+	ro.mcu.baudRate=2 \
+	ro.kernel.android.mcu=ttyAMA2
+
 DEVICE_PACKAGE_OVERLAYS := device/nexell/zh_dragon/overlay
 
 # limit dex2oat threads to improve thermals
@@ -194,6 +215,25 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 #skip boot jars check
 SKIP_BOOT_JARS_CHECK := true
+
+# wifi
+PRODUCT_PACKAGES += \
+	libwpa_client \
+	hostapd \
+	wpa_supplicant \
+	wpa_supplicant.conf
+
+PRODUCT_PACKAGES += \
+	rtw_fwloader
+
+PRODUCT_COPY_FILES += \
+	hardware/realtek/wlan/driver/rtl8189fs/wlan.ko:system/vendor/realtek/wlan.ko
+
+PRODUCT_PROPERTY_OVERRIDES += \
+	wifi.interface=wlan0
+
+$(call inherit-product-if-exists, hardware/realtek/wlan/config/p2p_supplicant.mk)
+
 
 # libfuse
 PRODUCT_PACKAGES += \

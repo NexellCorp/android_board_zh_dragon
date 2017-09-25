@@ -8,17 +8,22 @@ export TOP
 source ${TOP}/device/nexell/tools/common.sh
 source ${TOP}/device/nexell/tools/dir.sh
 source ${TOP}/device/nexell/tools/make_build_info.sh
+source ${TOP}/device/nexell/tools/revert_patches.sh
 
 parse_args -s s5p4418 $@
 print_args
 setup_toolchain
 export_work_dir
 
-${TOP}/device/nexell/tools/revert_patches.sh
-patches
+revert_common ${TOP}/device/nexell/zh_dragon/patch
+revert_common ${TOP}/device/nexell/patch
+revert_common ${TOP}/device/nexell/quickboot/patch
+
+patch_common ${TOP}/device/nexell/patch
 if [ "${QUICKBOOT}" == "true" ]; then
-	quickboot_patches
+	patch_common ${TOP}/device/nexell/quickboot/patch
 fi
+patch_common ${TOP}/device/nexell/zh_dragon/patch
 
 DEV_PORTNUM=0
 MEMSIZE="2GB"
@@ -197,3 +202,124 @@ fi
 gen_boot_usb_script_4418 nxp4330 ${ADDRESS} ${RESULT_DIR}
 
 make_build_info ${RESULT_DIR}
+
+# handling ZH Patch
+function get_apk_lib()
+{
+	local target_path=${1}
+
+	mkdir -p ${target_path}/system-lib
+
+	for f in `ls ${target_path}/system-app/*.apk`
+	do
+		echo "unzip ${f}"
+		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
+	done
+
+	for f in `ls ${target_path}/system-priv-app/*.apk`
+	do
+		echo "unzip ${f}"
+		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
+	done
+
+	find ${target_path}/third-lib/ -name *.so | xargs -i cp {} ${target_path}/system-lib/
+}
+
+
+function copy_apk()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*.apk`
+	do
+		apk_name=${f##*/}
+		apk_folder_name=${apk_name%%.apk}
+		apk_dir=${dest_dir}/${apk_folder_name}
+
+		sudo mkdir -p ${apk_dir}
+		sudo chmod 755 ${apk_dir}
+		sudo cp ${f} ${apk_dir}
+		sudo chmod 644 ${apk_dir}/${apk_name}
+
+	done
+}
+
+
+function copy_bin()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*`
+	do
+		bin_name=${f##*/}
+		sudo cp $f ${dest_dir}
+		sudo chmod 755 ${dest_dir}/${bin_name}
+	done
+}
+
+function install_zh_apk()
+{
+	project_app_out_name=${DEVICE_DIR}/apk_install
+	local_tools_path=${TOP}/out/host/linux-x86
+
+	pushd `pwd`
+	cd ${project_app_out_name}
+	${local_tools_path}/bin/simg2img ${TOP}/${RESULT_DIR}/system.img raw_system.img
+
+	echo "*****mount raw_system.img*****"
+	mkdir -p raw_system
+	sudo mount -t ext4 -o loop raw_system.img raw_system/
+
+	echo "****cp project app ****"
+	get_apk_lib ${project_app_out_name}
+
+	copy_apk ${project_app_out_name}/system-app ./raw_system/app
+	copy_apk ${project_app_out_name}/system-priv-app ./raw_system/priv-app
+
+	sudo cp ${project_app_out_name}/system-lib/* ./raw_system/lib/
+
+	echo "****cp project bin ****"
+	copy_bin ${project_app_out_name}/system-bin ./raw_system/bin
+
+
+	echo "cp others"
+	#sudo cp ${project_app_out_name}/other/config.ini  ./raw_system/
+	#sudo cp ${project_app_out_name}/other/ring.mp3  ./raw_system/
+
+
+	echo "删除原生应用及其相关lib"
+	sudo rm -rf ./raw_system/app/Camera2
+	sudo rm -rf ./raw_system/lib/libjni_jpegutil.so
+	sudo rm -rf ./raw_system/lib/libjni_tinyplanet.so
+	sudo rm -rf ./raw_system/app/Gallery2
+	sudo rm -rf ./raw_system/lib/libjni_eglfence.so
+	sudo rm -rf ./raw_system/lib/libjni_filtershow_filters.so
+	sudo rm -rf ./raw_system/lib/libjni_jpegstream.so
+
+
+	echo "已设置文件操作权限"
+	sudo chmod 644 ./raw_system/lib/*.so || echo "fail ..."
+	sudo chmod 644 ./raw_system/config.ini || echo "fail ..."
+	sudo chmod 644 ./raw_system/ring.mp3 || echo "fail ..."
+	sudo chmod 755 ./raw_system/bin/gocsdk || echo "fail ..."
+
+	echo "*****make_ext4fs system.img*****"
+	export LD_LIBRARY_PATH=${local_tools_path}/lib:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=${local_tools_path}/lib64:$LD_LIBRARY_PATH
+	sudo ${local_tools_path}/bin/make_ext4fs -s -T -1 -S ${OUT_DIR}/root/file_contexts.bin -L system -l 2147483648 -a system new_system.img raw_system/
+
+	sudo umount raw_system/
+	rm -rf raw_system/
+	rm -rf system-lib/
+
+	rm raw_system.img
+
+	sudo mv new_system.img ${TOP}/${RESULT_DIR}/system.img
+
+	echo "*****Successfully*****"
+	popd
+}
+
+test -d ${DEVICE_DIR}/apk_install && install_zh_apk

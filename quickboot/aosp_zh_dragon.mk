@@ -47,5 +47,5 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += config.disable_vrmanager=true
 
 $(call inherit-product, device/nexell/zh_dragon/device.mk)
 
-PRODUCT_PACKAGES += \
+# PRODUCT_PACKAGES += \
 	Launcher3

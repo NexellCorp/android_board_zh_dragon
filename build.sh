@@ -84,7 +84,212 @@ fi
 
 test -d ${OUT_DIR} && test -f ${DEVICE_DIR}/bootloader && cp ${DEVICE_DIR}/bootloader ${OUT_DIR}
 
-if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ]; then
+# handling ZH Patch
+function get_apk_lib()
+{
+	local target_path=${1}
+
+	mkdir -p ${target_path}/system-lib
+
+	for f in `ls ${target_path}/system-app/*.apk`
+	do
+		echo "unzip ${f}"
+		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
+	done
+
+	for f in `ls ${target_path}/system-priv-app/*.apk`
+	do
+		echo "unzip ${f}"
+		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
+	done
+
+	find ${target_path}/third-lib/ -name *.so | xargs -i cp {} ${target_path}/system-lib/
+}
+
+function copy_apk_sudo()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*.apk`
+	do
+		apk_name=${f##*/}
+		apk_folder_name=${apk_name%%.apk}
+		apk_dir=${dest_dir}/${apk_folder_name}
+
+		sudo mkdir -p ${apk_dir}
+		sudo chmod 755 ${apk_dir}
+		sudo cp ${f} ${apk_dir}
+		sudo chmod 644 ${apk_dir}/${apk_name}
+
+	done
+}
+
+function copy_bin_sudo()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*`
+	do
+		bin_name=${f##*/}
+		sudo cp $f ${dest_dir}
+		sudo chmod 755 ${dest_dir}/${bin_name}
+	done
+}
+
+function install_zh_apk_sudo()
+{
+	project_app_out_name=${DEVICE_DIR}/apk_install
+	local_tools_path=${TOP}/out/host/linux-x86
+
+	pushd `pwd`
+	cd ${project_app_out_name}
+	${local_tools_path}/bin/simg2img ${TOP}/${RESULT_DIR}/system.img raw_system.img
+
+	echo "*****mount raw_system.img*****"
+	mkdir -p raw_system
+	sudo mount -t ext4 -o loop raw_system.img raw_system/
+
+	echo "****cp project app ****"
+	get_apk_lib ${project_app_out_name}
+
+	copy_apk_sudo ${project_app_out_name}/system-app ./raw_system/app
+	copy_apk_sudo ${project_app_out_name}/system-priv-app ./raw_system/priv-app
+
+	sudo cp ${project_app_out_name}/system-lib/* ./raw_system/lib/
+
+	echo "****cp project bin ****"
+	copy_bin_sudo ${project_app_out_name}/system-bin ./raw_system/bin
+
+
+	echo "cp others"
+	#sudo cp ${project_app_out_name}/other/config.ini  ./raw_system/
+	#sudo cp ${project_app_out_name}/other/ring.mp3  ./raw_system/
+
+
+	echo "删除原生应用及其相关lib"
+	sudo rm -rf ./raw_system/app/Camera2
+	sudo rm -rf ./raw_system/lib/libjni_jpegutil.so
+	sudo rm -rf ./raw_system/lib/libjni_tinyplanet.so
+	sudo rm -rf ./raw_system/app/Gallery2
+	sudo rm -rf ./raw_system/lib/libjni_eglfence.so
+	sudo rm -rf ./raw_system/lib/libjni_filtershow_filters.so
+	sudo rm -rf ./raw_system/lib/libjni_jpegstream.so
+
+
+	echo "已设置文件操作权限"
+	sudo chmod 644 ./raw_system/lib/*.so || echo "fail ..."
+	sudo chmod 644 ./raw_system/config.ini || echo "fail ..."
+	sudo chmod 644 ./raw_system/ring.mp3 || echo "fail ..."
+	sudo chmod 755 ./raw_system/bin/gocsdk || echo "fail ..."
+
+	echo "*****make_ext4fs system.img*****"
+	export LD_LIBRARY_PATH=${local_tools_path}/lib:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=${local_tools_path}/lib64:$LD_LIBRARY_PATH
+	sudo ${local_tools_path}/bin/make_ext4fs -s -T -1 -S ${OUT_DIR}/root/file_contexts.bin -L system -l 2147483648 -a system new_system.img raw_system/
+
+	sudo umount raw_system/
+	rm -rf raw_system/
+	rm -rf system-lib/
+
+	rm raw_system.img
+
+	sudo mv new_system.img ${TOP}/${RESULT_DIR}/system.img
+
+	echo "*****Successfully*****"
+	popd
+}
+
+function copy_apk()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*.apk`
+	do
+		apk_name=${f##*/}
+		apk_folder_name=${apk_name%%.apk}
+		apk_dir=${dest_dir}/${apk_folder_name}
+
+		mkdir -p ${apk_dir}
+		chmod 755 ${apk_dir}
+		cp ${f} ${apk_dir}
+		chmod 644 ${apk_dir}/${apk_name}
+
+	done
+}
+
+function copy_bin()
+{
+	local src_dir=${1}
+	local dest_dir=${2}
+
+	for f in `ls ${src_dir}/*`
+	do
+		bin_name=${f##*/}
+		cp $f ${dest_dir}
+		chmod 755 ${dest_dir}/${bin_name}
+	done
+}
+
+function install_zh_apk()
+{
+	local project_app_out_name=${DEVICE_DIR}/apk_install
+	local local_tools_path=${TOP}/out/host/linux-x86
+	local dest_dir=${OUT_DIR}/system
+
+	pushd `pwd`
+	cd ${project_app_out_name}
+
+	echo "****cp project app ****"
+	get_apk_lib ${project_app_out_name}
+
+	copy_apk ${project_app_out_name}/system-app ${dest_dir}/app
+	copy_apk ${project_app_out_name}/system-priv-app ${dest_dir}/priv-app
+
+	cp ${project_app_out_name}/system-lib/* ${dest_dir}/lib/
+
+	echo "****cp project bin ****"
+	copy_bin ${project_app_out_name}/system-bin ${dest_dir}/bin
+
+
+	echo "cp others"
+	#cp ${project_app_out_name}/other/config.ini ${dest_dir}
+	#cp ${project_app_out_name}/other/ring.mp3 ${dest_dir}
+
+
+	echo "删除原生应用及其相关lib"
+	rm -rf ${dest_dir}/app/Camera2
+	rm -rf ${dest_dir}/lib/libjni_jpegutil.so
+	rm -rf ${dest_dir}/lib/libjni_tinyplanet.so
+	rm -rf ${dest_dir}/app/Gallery2
+	rm -rf ${dest_dir}/lib/libjni_eglfence.so
+	rm -rf ${dest_dir}/lib/libjni_filtershow_filters.so
+	rm -rf ${dest_dir}/lib/libjni_jpegstream.so
+
+
+	echo "已设置文件操作权限"
+	chmod 644 ${dest_dir}/lib/*.so || echo "fail ..."
+	chmod 644 ${dest_dir}/config.ini || echo "fail ..."
+	chmod 644 ${dest_dir}/ring.mp3 || echo "fail ..."
+	chmod 755 ${dest_dir}/bin/gocsdk || echo "fail ..."
+
+	echo "*****make_ext4fs system.img*****"
+	export LD_LIBRARY_PATH=${local_tools_path}/lib:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=${local_tools_path}/lib64:$LD_LIBRARY_PATH
+	${local_tools_path}/bin/make_ext4fs -s -T -1 -S ${OUT_DIR}/root/file_contexts.bin \
+		-L system -l 2147483648 -a system \
+		${OUT_DIR}/system.img \
+		${OUT_DIR}/system
+
+	rm -rf system-lib/
+
+	echo "*****Successfully*****"
+	popd
+}
+
+if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ] || [ "${BUILD_DIST}" == "true" ]; then
 	if [ "${QUICKBOOT}" == "true" ]; then
 		cp ${DEVICE_DIR}/quickboot/* ${DEVICE_DIR}
 
@@ -95,9 +300,7 @@ if [ "${BUILD_ALL}" == "true" ] || [ "${BUILD_ANDROID}" == "true" ]; then
 
 	build_android ${TARGET_SOC} ${BOARD_NAME} ${BUILD_TAG}
 
-	cd ${DEVICE_DIR}
-	git checkout aosp_zh_dragon.mk
-	cd ${TOP}
+	test -d ${DEVICE_DIR}/apk_install && install_zh_apk
 fi
 
 # u-boot envs
@@ -178,6 +381,14 @@ if [ "${BUILD_KERNEL}" == "true" ]; then
 			${OUT_DIR}/boot.img \
 			2048 \
 			"buildvariant=${BUILD_TAG}"
+	test -f ${OUT_DIR}/ramdisk-recovery.img && \
+		make_android_bootimg \
+			${KERNEL_IMG} \
+			${DTB_IMG} \
+			${OUT_DIR}/ramdisk-recovery.img \
+			${OUT_DIR}/recovery.img \
+			2048 \
+			"buildvariant=${BUILD_TAG}"
 fi
 
 post_process ${TARGET_SOC} \
@@ -203,123 +414,8 @@ gen_boot_usb_script_4418 nxp4330 ${ADDRESS} ${RESULT_DIR}
 
 make_build_info ${RESULT_DIR}
 
-# handling ZH Patch
-function get_apk_lib()
-{
-	local target_path=${1}
+# test -d ${DEVICE_DIR}/apk_install && install_zh_apk_sudo
 
-	mkdir -p ${target_path}/system-lib
-
-	for f in `ls ${target_path}/system-app/*.apk`
-	do
-		echo "unzip ${f}"
-		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
-	done
-
-	for f in `ls ${target_path}/system-priv-app/*.apk`
-	do
-		echo "unzip ${f}"
-		unzip -jo $f lib/armeabi/*.so -d ${target_path}/system-lib/ || echo "no *.so"
-	done
-
-	find ${target_path}/third-lib/ -name *.so | xargs -i cp {} ${target_path}/system-lib/
-}
-
-
-function copy_apk()
-{
-	local src_dir=${1}
-	local dest_dir=${2}
-
-	for f in `ls ${src_dir}/*.apk`
-	do
-		apk_name=${f##*/}
-		apk_folder_name=${apk_name%%.apk}
-		apk_dir=${dest_dir}/${apk_folder_name}
-
-		sudo mkdir -p ${apk_dir}
-		sudo chmod 755 ${apk_dir}
-		sudo cp ${f} ${apk_dir}
-		sudo chmod 644 ${apk_dir}/${apk_name}
-
-	done
-}
-
-
-function copy_bin()
-{
-	local src_dir=${1}
-	local dest_dir=${2}
-
-	for f in `ls ${src_dir}/*`
-	do
-		bin_name=${f##*/}
-		sudo cp $f ${dest_dir}
-		sudo chmod 755 ${dest_dir}/${bin_name}
-	done
-}
-
-function install_zh_apk()
-{
-	project_app_out_name=${DEVICE_DIR}/apk_install
-	local_tools_path=${TOP}/out/host/linux-x86
-
-	pushd `pwd`
-	cd ${project_app_out_name}
-	${local_tools_path}/bin/simg2img ${TOP}/${RESULT_DIR}/system.img raw_system.img
-
-	echo "*****mount raw_system.img*****"
-	mkdir -p raw_system
-	sudo mount -t ext4 -o loop raw_system.img raw_system/
-
-	echo "****cp project app ****"
-	get_apk_lib ${project_app_out_name}
-
-	copy_apk ${project_app_out_name}/system-app ./raw_system/app
-	copy_apk ${project_app_out_name}/system-priv-app ./raw_system/priv-app
-
-	sudo cp ${project_app_out_name}/system-lib/* ./raw_system/lib/
-
-	echo "****cp project bin ****"
-	copy_bin ${project_app_out_name}/system-bin ./raw_system/bin
-
-
-	echo "cp others"
-	#sudo cp ${project_app_out_name}/other/config.ini  ./raw_system/
-	#sudo cp ${project_app_out_name}/other/ring.mp3  ./raw_system/
-
-
-	echo "删除原生应用及其相关lib"
-	sudo rm -rf ./raw_system/app/Camera2
-	sudo rm -rf ./raw_system/lib/libjni_jpegutil.so
-	sudo rm -rf ./raw_system/lib/libjni_tinyplanet.so
-	sudo rm -rf ./raw_system/app/Gallery2
-	sudo rm -rf ./raw_system/lib/libjni_eglfence.so
-	sudo rm -rf ./raw_system/lib/libjni_filtershow_filters.so
-	sudo rm -rf ./raw_system/lib/libjni_jpegstream.so
-
-
-	echo "已设置文件操作权限"
-	sudo chmod 644 ./raw_system/lib/*.so || echo "fail ..."
-	sudo chmod 644 ./raw_system/config.ini || echo "fail ..."
-	sudo chmod 644 ./raw_system/ring.mp3 || echo "fail ..."
-	sudo chmod 755 ./raw_system/bin/gocsdk || echo "fail ..."
-
-	echo "*****make_ext4fs system.img*****"
-	export LD_LIBRARY_PATH=${local_tools_path}/lib:$LD_LIBRARY_PATH
-	export LD_LIBRARY_PATH=${local_tools_path}/lib64:$LD_LIBRARY_PATH
-	sudo ${local_tools_path}/bin/make_ext4fs -s -T -1 -S ${OUT_DIR}/root/file_contexts.bin -L system -l 2147483648 -a system new_system.img raw_system/
-
-	sudo umount raw_system/
-	rm -rf raw_system/
-	rm -rf system-lib/
-
-	rm raw_system.img
-
-	sudo mv new_system.img ${TOP}/${RESULT_DIR}/system.img
-
-	echo "*****Successfully*****"
-	popd
-}
-
-test -d ${DEVICE_DIR}/apk_install && install_zh_apk
+cd ${DEVICE_DIR}
+git checkout aosp_zh_dragon.mk
+cd ${TOP}
